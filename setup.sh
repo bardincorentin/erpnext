@@ -26,11 +26,11 @@ echo ""
 
 # Vérifier que Docker est installé
 command -v docker >/dev/null 2>&1 || err "Docker n'est pas installé. Installez Docker puis relancez ce script."
-command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 || err "Docker Compose n'est pas disponible."
+docker compose version >/dev/null 2>&1 || err "Docker Compose n'est pas disponible."
 
-# Charger les variables d'environnement
-[ -f .env ] || err "Fichier .env introuvable. Copiez .env.exemple en .env et configurez-le."
-source .env
+# Charger le fichier .env (set -a exporte toutes les variables, gère les espaces)
+[ -f .env ] || err "Fichier .env introuvable."
+set -a; source .env; set +a
 
 ok "Docker détecté"
 info "Site : $SITE_NAME | Société : $COMPANY_NAME"
@@ -41,25 +41,30 @@ info "Démarrage de la base de données et du cache..."
 docker compose up -d db redis
 echo ""
 
-# Attendre que MariaDB soit prêt
+# Attendre que MariaDB soit prêt (sans set -e interférer)
 info "Attente de la base de données (30 secondes max)..."
+PRET=0
 for i in $(seq 1 30); do
-    docker compose exec db mysqladmin ping -h localhost --password="$MYSQL_ROOT_PASSWORD" --silent 2>/dev/null && break
+    if docker compose exec db mysqladmin ping -h localhost --silent 2>/dev/null; then
+        PRET=1
+        break
+    fi
     echo -n "."
     sleep 1
 done
 echo ""
+[ $PRET -eq 1 ] || err "La base de données ne répond pas après 30 secondes."
 ok "Base de données prête"
 
 # Étape 2 : Configurer ERPNext
-info "Configuration d'ERPNext..."
-docker compose run --rm configurateur
+info "Configuration d'ERPNext (connexions Redis/MariaDB)..."
+docker compose --profile setup run --rm configurateur
 ok "Configuration terminée"
 
-# Étape 3 : Créer le site BCIT
+# Étape 3 : Créer le site BCIT (~5 minutes)
 info "Création du site $SITE_NAME (opération longue, ~5 minutes)..."
-docker compose run --rm creation-site
-ok "Site créé"
+docker compose --profile setup run --rm creation-site
+ok "Site créé avec succès"
 
 # Étape 4 : Démarrer tous les services
 info "Démarrage de tous les services..."
@@ -71,33 +76,14 @@ echo "============================================================"
 echo "  Installation terminée !"
 echo "============================================================"
 echo ""
-echo "  Accès : http://localhost:${PORT:-8080}"
-echo "  Login : Administrator"
+echo "  Accès        : http://localhost:${PORT:-8080}"
+echo "  Login        : Administrator"
 echo "  Mot de passe : $ADMIN_PASSWORD"
 echo ""
 echo "  Prochaines étapes dans ERPNext :"
 echo "  1. Créer la société 'BCIT Formation'"
-echo "  2. Configurer le plan comptable français"
+echo "  2. Sélectionner le plan comptable français"
 echo "  3. Ajouter les utilisateurs"
-echo ""
-
-# Étape 5 : Créer la société via bench
-info "Création de la société BCIT Formation..."
-docker compose exec backend bench --site "$SITE_NAME" execute \
-    frappe.client.insert \
-    --args "{
-        'doctype': 'Company',
-        'company_name': '$COMPANY_NAME',
-        'abbr': '$COMPANY_ABBR',
-        'default_currency': '$CURRENCY',
-        'country': '$COUNTRY',
-        'phone_no': '',
-        'website': 'www.bcit.fr',
-        'address_line1': '33 rue des Charmes',
-        'city': 'PRANZAC',
-        'pincode': '16110'
-    }" 2>/dev/null && ok "Société '$COMPANY_NAME' créée" || info "La société sera à créer manuellement dans ERPNext"
-
 echo ""
 echo "  Commandes utiles :"
 echo "  Arrêter    : docker compose down"

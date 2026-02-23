@@ -19,7 +19,7 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
     healthcheck:
-      test: mysqladmin ping -h localhost --password=${MYSQL_ROOT_PASSWORD}
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       retries: 20
 
@@ -30,43 +30,53 @@ services:
     volumes:
       - redis-data:/data
 
-  # Configuration initiale (s'exécute une seule fois)
+  # Configuration initiale — uniquement via setup.sh
   configurateur:
     image: frappe/erpnext:v15
     restart: "no"
-    entrypoint: bash -c
-    command: >
-      "bench set-config -gy db_host db &&
-       bench set-config -gpy db_port 3306 &&
-       bench set-config -gy redis_cache redis://redis:6379 &&
-       bench set-config -gy redis_queue redis://redis:6379 &&
-       bench set-config -gy redis_socketio redis://redis:6379 &&
-       bench set-config -gpy socketio_port 9000"
+    profiles: ["setup"]
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - >-
+        bench set-config -gy db_host db &&
+        bench set-config -gpy db_port 3306 &&
+        bench set-config -gy redis_cache redis://redis:6379 &&
+        bench set-config -gy redis_queue redis://redis:6379 &&
+        bench set-config -gy redis_socketio redis://redis:6379 &&
+        bench set-config -gpy socketio_port 9000
     volumes:
       - sites:/home/frappe/frappe-bench/sites
 
-  # Création du site BCIT (s'exécute une seule fois)
+  # Création du site BCIT — uniquement via setup.sh
   creation-site:
     image: frappe/erpnext:v15
     restart: "no"
+    profiles: ["setup"]
     depends_on:
       db:
         condition: service_healthy
-    entrypoint: bash -c
-    command: >
-      "wait-for-it -t 120 db:3306 &&
-       wait-for-it -t 120 redis:6379 &&
-       sleep 5 &&
-       bench new-site
-         --mariadb-root-password ${MYSQL_ROOT_PASSWORD}
-         --admin-password ${ADMIN_PASSWORD}
-         --no-mariadb-socket
-         --language fr
-         ${SITE_NAME} &&
-       bench --site ${SITE_NAME} install-app erpnext &&
-       bench --site ${SITE_NAME} set-config default_country France &&
-       bench --site ${SITE_NAME} set-config time_zone 'Europe/Paris' &&
-       echo '✓ Site BCIT Formation créé avec succès'"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SITE_NAME: ${SITE_NAME}
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - >-
+        wait-for-it -t 120 db:3306 &&
+        wait-for-it -t 120 redis:6379 &&
+        bench new-site
+        --mariadb-root-password $$MYSQL_ROOT_PASSWORD
+        --admin-password $$ADMIN_PASSWORD
+        --no-mariadb-socket
+        $$SITE_NAME &&
+        bench --site $$SITE_NAME install-app erpnext &&
+        bench --site $$SITE_NAME set-config default_country France &&
+        bench --site $$SITE_NAME set-config time_zone "Europe/Paris" &&
+        echo "Site BCIT Formation cree avec succes"
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -75,8 +85,6 @@ services:
   backend:
     image: frappe/erpnext:v15
     restart: unless-stopped
-    depends_on:
-      - configurateur
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -85,7 +93,9 @@ services:
   websocket:
     image: frappe/erpnext:v15
     restart: unless-stopped
-    command: node /home/frappe/frappe-bench/apps/frappe/socketio.js
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
     volumes:
       - sites:/home/frappe/frappe-bench/sites
 
@@ -93,7 +103,11 @@ services:
   file-attente:
     image: frappe/erpnext:v15
     restart: unless-stopped
-    command: bench worker --queue short,default,long
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default,long
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -102,7 +116,9 @@ services:
   planificateur:
     image: frappe/erpnext:v15
     restart: unless-stopped
-    command: bench schedule
+    command:
+      - bench
+      - schedule
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
@@ -116,7 +132,7 @@ services:
       FRAPPE_SITE_NAME_HEADER: ${SITE_NAME}
       SOCKETIO: websocket:9000
       CLIENT_MAX_BODY_SIZE: 50m
-      PROXY_READ_TIMEOUT: 120
+      PROXY_READ_TIMEOUT: "120"
     ports:
       - "${PORT:-8080}:8080"
     volumes:
