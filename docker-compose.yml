@@ -1,0 +1,149 @@
+# ============================================================
+# BCIT Formation - Cybersécurité Conseil, Audit & Formation
+# 33 rue des Charmes, 16110 PRANZAC | www.bcit.fr
+# ERPNext v15 - Configuration Docker simplifiée
+# ============================================================
+
+services:
+
+  # Base de données MariaDB
+  db:
+    image: mariadb:10.6
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 20
+
+  # Cache Redis
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  # Configuration initiale — uniquement via setup.sh
+  configurateur:
+    image: frappe/erpnext:v15
+    restart: "no"
+    profiles: ["setup"]
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - >-
+        bench set-config -gy db_host db &&
+        bench set-config -gpy db_port 3306 &&
+        bench set-config -gy redis_cache redis://redis:6379 &&
+        bench set-config -gy redis_queue redis://redis:6379 &&
+        bench set-config -gy redis_socketio redis://redis:6379 &&
+        bench set-config -gpy socketio_port 9000
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+
+  # Création du site BCIT — uniquement via setup.sh
+  creation-site:
+    image: frappe/erpnext:v15
+    restart: "no"
+    profiles: ["setup"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SITE_NAME: ${SITE_NAME}
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - >-
+        wait-for-it -t 120 db:3306 &&
+        wait-for-it -t 120 redis:6379 &&
+        bench new-site
+        --mariadb-root-password $$MYSQL_ROOT_PASSWORD
+        --admin-password $$ADMIN_PASSWORD
+        --no-mariadb-socket
+        $$SITE_NAME &&
+        bench --site $$SITE_NAME install-app erpnext &&
+        bench --site $$SITE_NAME set-config default_country France &&
+        bench --site $$SITE_NAME set-config time_zone "Europe/Paris" &&
+        echo "Site BCIT Formation cree avec succes"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+
+  # Serveur applicatif principal
+  backend:
+    image: frappe/erpnext:v15
+    restart: unless-stopped
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+
+  # Serveur WebSocket (notifications temps réel)
+  websocket:
+    image: frappe/erpnext:v15
+    restart: unless-stopped
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+
+  # File de tâches (emails, rapports, etc.)
+  file-attente:
+    image: frappe/erpnext:v15
+    restart: unless-stopped
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default,long
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+
+  # Planificateur de tâches
+  planificateur:
+    image: frappe/erpnext:v15
+    restart: unless-stopped
+    command:
+      - bench
+      - schedule
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+
+  # Interface web (port 8080)
+  frontend:
+    image: frappe/erpnext:v15
+    restart: unless-stopped
+    environment:
+      BACKEND: backend:8000
+      FRAPPE_SITE_NAME_HEADER: ${SITE_NAME}
+      SOCKETIO: websocket:9000
+      CLIENT_MAX_BODY_SIZE: 50m
+      PROXY_READ_TIMEOUT: "120"
+    ports:
+      - "${PORT:-8080}:8080"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+    depends_on:
+      - backend
+      - websocket
+
+volumes:
+  db-data:
+  redis-data:
+  sites:
+  logs:
