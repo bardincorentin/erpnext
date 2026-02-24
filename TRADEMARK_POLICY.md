@@ -1,36 +1,36 @@
-## Logo and Trademark Policy
+## Politique sur le logo et les marques déposées
 
-The brand name ERPNext and the logo are trademarks of Frappe Technologies Pvt. Ltd.
+Le nom de marque ERPNext et le logo sont des marques déposées de Frappe Technologies Pvt. Ltd.
 
 ### Introduction
 
-Frappe Technologies Pvt. Ltd. (Frappe) owns and oversees the trademarks for the ERPNext name and logos. We have developed this trademark usage policy with the following goals in mind:
+Frappe Technologies Pvt. Ltd. (Frappe) détient et supervise les marques déposées pour le nom et les logos ERPNext. Nous avons développé cette politique d'utilisation des marques déposées avec les objectifs suivants :
 
-- We’d like to make it easy for anyone to use the ERPNext name or logo for community-oriented efforts that help spread and improve ERPNext.
-- We’d like to make it clear how ERPNext-related businesses and projects can (and cannot) use the ERPNext name and logo.
-- We’d like to make it hard for anyone to use the ERPNext name and logo to unfairly profit from, trick or confuse people who are looking for official ERPNext resources.
+- Nous souhaitons faciliter l'utilisation du nom ou du logo ERPNext pour des efforts orientés vers la communauté qui aident à diffuser et améliorer ERPNext.
+- Nous souhaitons clarifier comment les entreprises et les projets liés à ERPNext peuvent (et ne peuvent pas) utiliser le nom et le logo ERPNext.
+- Nous souhaitons rendre difficile l'utilisation du nom et du logo ERPNext pour profiter injustement, tromper ou confondre les personnes qui recherchent des ressources ERPNext officielles.
 
-### Frappe Trademark Usage Policy
+### Politique d'utilisation des marques Frappe
 
-Permission from Frappe is required to use the ERPNext name or logo as part of any project, product, service, domain or company name.
+L'autorisation de Frappe est requise pour utiliser le nom ou le logo ERPNext dans le cadre de tout projet, produit, service, nom de domaine ou nom d'entreprise.
 
-We will grant permission to use the ERPNext name and logo for projects that meet the following criteria:
+Nous accorderons l'autorisation d'utiliser le nom et le logo ERPNext pour les projets qui répondent aux critères suivants :
 
-- The primary purpose of your project is to promote the spread and improvement of the ERPNext software.
-- Your project is non-commercial in nature (it can make money to cover its costs or contribute to non-profit entities, but it cannot be run as a for-profit project or business).
-Your project neither promotes nor is associated with entities that currently fail to comply with the GPL license under which ERPNext is distributed.
-- If your project meets these criteria, you will be permitted to use the ERPNext name and logo to promote your project in any way you see fit with one exception: Please do not use ERPNext as part of a domain name.
+- L'objectif principal de votre projet est de promouvoir la diffusion et l'amélioration du logiciel ERPNext.
+- Votre projet est de nature non commerciale (il peut générer des revenus pour couvrir ses coûts ou contribuer à des entités à but non lucratif, mais il ne peut pas être géré comme un projet ou une entreprise à but lucratif).
+- Votre projet ne promeut pas et n'est pas associé à des entités qui ne respectent pas actuellement la licence GPL sous laquelle ERPNext est distribué.
+- Si votre projet répond à ces critères, vous serez autorisé à utiliser le nom et le logo ERPNext pour promouvoir votre projet de toute manière que vous jugez appropriée, à une exception près : veuillez ne pas utiliser ERPNext comme partie d'un nom de domaine.
 
-Use of the ERPNext name and logo is additionally allowed in the following situations:
+L'utilisation du nom et du logo ERPNext est également autorisée dans les situations suivantes :
 
-All other ERPNext-related businesses or projects can use the ERPNext name and logo to refer to and explain their services, but they cannot use them as part of a product, project, service, domain, or company name and they cannot use them in any way that suggests an affiliation with or endorsement by ERPNext or Frappe Technologies or the ERPNext open source project. For example, a consulting company can describe its business as “123 Web Services, offering ERPNext consulting for small businesses,” but cannot call its business “The ERPNext Consulting Company.”
+Toutes les autres entreprises ou projets liés à ERPNext peuvent utiliser le nom et le logo ERPNext pour faire référence à leurs services et les expliquer, mais ils ne peuvent pas les utiliser dans le cadre d'un nom de produit, de projet, de service, de domaine ou d'entreprise, et ils ne peuvent pas les utiliser d'une manière qui suggère une affiliation avec ou une approbation par ERPNext, Frappe Technologies ou le projet open source ERPNext. Par exemple, une société de conseil peut décrire son activité comme « Services Web 123, offrant des conseils ERPNext pour les petites entreprises », mais ne peut pas appeler son activité « La Société de Conseil ERPNext ».
 
-Similarly, it’s OK to use the ERPNext logo as part of a page that describes your products or services, but it is not OK to use it as part of your company or product logo or branding itself. Under no circumstances is it permitted to use ERPNext as part of a top-level domain name.
+De même, il est acceptable d'utiliser le logo ERPNext dans le cadre d'une page qui décrit vos produits ou services, mais il n'est pas acceptable de l'utiliser dans le cadre du logo ou de l'image de marque de votre entreprise ou produit. En aucun cas, il n'est permis d'utiliser ERPNext comme partie d'un nom de domaine de premier niveau.
 
-We do not allow the use of the trademark in advertising, including AdSense/AdWords.
+Nous n'autorisons pas l'utilisation de la marque dans la publicité, y compris AdSense/AdWords.
 
-Please note that it is not the goal of this policy to limit commercial activity around ERPNext. We encourage ERPNext-based businesses, and we would love to see hundreds of them.
+Veuillez noter que l'objectif de cette politique n'est pas de limiter l'activité commerciale autour d'ERPNext. Nous encourageons les entreprises basées sur ERPNext et nous aimerions en voir des centaines.
 
-When in doubt about your use of the ERPNext name or logo, please contact Frappe Technologies for clarification.
+En cas de doute sur votre utilisation du nom ou du logo ERPNext, veuillez contacter Frappe Technologies pour clarification.
 
-(inspired by WordPress)
+(inspiré de WordPress)

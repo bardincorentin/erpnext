@@ -1,7 +1,7 @@
-# Security Policy
+# Politique de sécurité
 
-The ERPNext team and community take security issues seriously. To report a security issue, fill out the form at [https://erpnext.com/security/report](https://erpnext.com/security/report).
+L'équipe ERPNext et la communauté prennent les problèmes de sécurité très au sérieux. Pour signaler un problème de sécurité, remplissez le formulaire sur [https://erpnext.com/security/report](https://erpnext.com/security/report).
 
-You can help us make ERPNext and all it's users more secure by following the [Reporting guidelines](https://erpnext.com/security).
+Vous pouvez nous aider à rendre ERPNext et tous ses utilisateurs plus sécurisés en suivant les [directives de signalement](https://erpnext.com/security).
 
-We appreciate your efforts to responsibly disclose your findings. We'll endeavor to respond quickly, and will keep you updated throughout the process.
+Nous apprécions vos efforts pour divulguer vos découvertes de manière responsable. Nous nous efforcerons de répondre rapidement et vous tiendrons informé tout au long du processus.
